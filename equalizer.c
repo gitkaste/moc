@@ -304,12 +304,10 @@ void equalizer_read_config()
   char presetbuf[128];
   presetbuf[0] = 0;
 
-  size_t buffersize = -1;
-  ssize_t  readbytes=-1;
   int tmp;
   float ftmp;
 
-  while((readbytes=getline(&linebuffer, &buffersize, cf)>-1))
+  while((linebuffer=xgetline(cf)))
   {
     if(
       strncasecmp
@@ -369,9 +367,8 @@ void equalizer_read_config()
           }
         }
     }
+    free(linebuffer);
   }
-
-  free(linebuffer);
 
   fclose(cf);
 

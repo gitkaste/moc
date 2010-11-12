@@ -11,8 +11,6 @@
  *  - Kamil Tarkowski <kamilt@interia.pl> - sec_to_min_plist()
  */
 
-#define DEBUG
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -3807,69 +3805,39 @@ void iface_get_key (struct iface_key *k)
 	
 	if ((ch = wgetch(main_win.win)) == (wint_t)ERR)
 		interface_fatal ("wgetch() failed");
-debug ("JCF: ch: 0x%04x", ch);
 
-	if (ch < 32 && ch != '\n' && ch != '\t' && ch != KEY_ESCAPE) {
-		/* Unprintable, generally control sequences */
-debug ("JCF: unprintable");
+	if (ch < 32 && ch != '\n' && ch != '\t') {  /* Unprintable, generally control sequences */
 		k->type = IFACE_KEY_FUNCTION;
 		k->key.func = ch;
-debug ("JCF: out: 0x%04x", ch);
-	}
-	else if (ch == 0x7f) {
-		/* Workaround for backspace on many terminals */
-debug ("JCF: backspace");
-		k->type = IFACE_KEY_FUNCTION;
-		k->key.func = KEY_BACKSPACE;
-debug ("JCF: out: 0x%04x", k->key.func);
 	}
 	else if (ch < 255) { /* Regular char */
 		int meta;
-debug ("JCF: Regular");
 
 #ifdef HAVE_NCURSESW
 		ungetch (ch);
 		if (wget_wch(main_win.win, &ch) == ERR)
 			interface_fatal ("wget_wch() failed");
 #endif
-		/* Recognize meta sequences.  ESC-ESC sequences cause
-		 * the remaining characters to be flushed as they can
-		 * be ambigous and lead to surprised users. */
+		/* Recognize meta sequences */
 		if (ch == KEY_ESCAPE) {
-debug ("JCF: Escape 1");
-			if ((meta = wgetch(main_win.win)) != ERR) {
-				if (meta == KEY_ESCAPE)
-{
-debug ("JCF: Escape Escape - flushing");
-					while (wgetch(main_win.win) != ERR);
-					interface_error ("ESC-ESC sequence ignored");
-}
-				else
-{
-debug ("JCF: Escape Char - Meta");
-debug ("JCF: ch: 0x%04x", meta);
-					ch = meta | META_KEY_FLAG;
-}
-			}
-else {
-debug ("JCF: Escape Pause - ESC");
-}
+			if((meta = wgetch(main_win.win)) != ERR)
+				ch = meta | META_KEY_FLAG;
 			k->type = IFACE_KEY_FUNCTION;
 			k->key.func = ch;
 		}
 		else {
-debug ("JCF: Char");
 			k->type = IFACE_KEY_CHAR;
 			k->key.ucs = ch;
 		}
-debug ("JCF: out: 0x%04x", ch);
 	}
 	else {
 	
-debug ("JCF: Func");
+		/* Workaround for backspace on many terminals */
+		if (ch == 0x7f)
+			ch = KEY_BACKSPACE;
+	
 		k->type = IFACE_KEY_FUNCTION;
 		k->key.func = ch;
-debug ("JCF: out: 0x%04x", ch);
 	}
 }
 

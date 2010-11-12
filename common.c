@@ -25,6 +25,7 @@
 #include "log.h"
 #include "common.h"
 #include "options.h"
+#include "lists.h"
 
 static int im_server = 0; /* Am I the server? */
 
@@ -96,6 +97,28 @@ char *xstrdup (const char *s)
 		fatal ("Can't allocate memory!");
 
 	return s ? n : NULL;
+}
+
+/* Read and return a line from 'stream' in a dynamically allocated buffer.
+ * Return NULL at end of file. */
+char *xgetline (FILE *stream)
+{
+	static char buffer[64];
+	char *result;
+	lists_t_strs *line;
+
+	line = lists_strs_new (4);
+
+	do {
+		if (!fgets (buffer, sizeof (buffer), stream))
+			break;
+		lists_strs_append (line, buffer);
+	} while (buffer[strlen (buffer) - 1] != '\n');
+
+	result = lists_strs_cat (line);
+	lists_strs_free (line);
+
+	return result;
 }
 
 void set_me_server ()

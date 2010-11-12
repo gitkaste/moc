@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
 
@@ -67,6 +68,7 @@ void *xmalloc (const size_t size);
 void *xcalloc (size_t nmemb, size_t size);
 void *xrealloc (void *ptr, const size_t size);
 char *xstrdup (const char *s);
+char *xgetline (FILE *stream);
 
 char *str_repl (char *target, const char *oldstr, const char *newstr);
 

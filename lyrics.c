@@ -47,21 +47,9 @@ void lyrics_lines_set (lists_t_strs *lines)
  * or NULL at end of file. */
 static char *get_line (FILE *stream)
 {
-	static char buffer[48];
 	char *result;
-	lists_t_strs *line;
 
-	line = lists_strs_new (4);
-
-	do {
-		if (!fgets (buffer, sizeof (buffer), stream))
-			break;
-		lists_strs_append (line, buffer);
-	} while (buffer[strlen (buffer) - 1] != '\n');
-
-	result = lists_strs_cat (line);
-	lists_strs_free (line);
-
+	result = xgetline (stream);
 	if (result) {
 		int length;
 
