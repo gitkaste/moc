@@ -4,6 +4,7 @@
 *Makefile.in
 *.deps
 *.libs
+config.h.in~
 aclocal.m4
 autom4te.cache/
 config.guess
