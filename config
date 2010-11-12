@@ -1,0 +1,7 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+[remote "github"]
+	url = git@github.com:gitkaste/moc.git
+	fetch = +refs/heads/*:refs/remotes/github/*
