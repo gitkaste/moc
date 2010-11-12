@@ -129,13 +129,23 @@ static void shutdown_callback (void *arg ATTR_UNUSED)
 static int moc_jack_init (struct output_driver_caps *caps)
 {
 	jack_set_error_function (error_callback);
-	
-	/* try to become a client of the JACK server */
-	if ((client = jack_client_new ("moc")) == 0) {
-		error ("cannot create client jack server not running?");
-		return 0;
+	jack_status_t status;
+
+	/*  open a client connection to the JACK server */
+	client = jack_client_open ("moc", JackNullOption, &status, NULL);
+	if (client == NULL) {
+		fprintf (stderr, "jack_client_open() failed, "
+				 "status = 0x%2.0x\n", status);
+		if (status & JackServerFailed) {
+			fprintf (stderr, "Unable to connect to JACK server\n");
+		}
+		return 1;
 	}
-	
+
+	if (status & JackServerStarted) {
+		fprintf (stderr, "JACK server started\n");
+	}
+
 	jack_shutdown = 0;
 	jack_on_shutdown (client, shutdown_callback, NULL);
 	
