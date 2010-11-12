@@ -42,7 +42,7 @@ esac
 
 AC_DEFINE([_FILE_OFFSET_BITS], 64, [Use 64bit IO])
 
-LDFLAGS="$LDFLAGS -export-dynamic"
+LDFLAGS="$LDFLAGS -rdynamic"
 
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
