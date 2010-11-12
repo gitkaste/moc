@@ -1857,7 +1857,7 @@ static void main_win_set_dir_content (struct main_win *w,
 	m = find_side_menu (w, iface_to_side_menu(iface_menu));
 
 	side_menu_make_list_content (m, files, dirs, playlists,
-			iface_menu == MENU_PLAYLIST);
+		(enum iface_menu)	iface_menu == MENU_PLAYLIST);
 	if (w->curr_file)
 		side_menu_mark_file (m, w->curr_file);
 	main_win_draw (w);
