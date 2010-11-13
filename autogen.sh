@@ -5,20 +5,32 @@ set -x
 if test -f Makefile; then
 	make distclean >/dev/null 2>/dev/null
 fi
-if [ `uname` = "Darwin" ]; then
-	glibtoolize -c -f
-	aclocal -I m4 -I /usr/local/share/aclocal
-else
-	libtoolize -c -f
-	aclocal -I m4 
+
+# Try to find where GNU libtool is hiding.  
+LIBTOOL_AKA="glibtoolize"
+if test -z "$LIBTOOLIZE"; then
+  for LIBTOOL in $LIBTOOL_AKA libtoolize; do
+    LIBTOOLIZE=`which $LIBTOOL 2>/dev/null`
+    if test $? -eq 0; then
+      if $LIBTOOLIZE --version | grep -q "GNU libtool"; then
+         break
+      fi
+      LIBTOOLIZE=
+    fi
+  done
+  if test -z "$LIBTOOLIZE"; then
+    echo "No suitable libtoolize found (set LIBTOOLIZE if necessary)."
+    exit 1
+  fi
 fi
-if [ "$?" = 0 ]; then
-	autoheader && \
-	automake -W all -a && \
-	autoconf -W syntax
-fi
-if [ "$?" != 0 ]
-then
+
+$LIBTOOLIZE -c -f
+aclocal -I m4 -I /usr/local/share/aclocal &&\
+autoheader && \
+automake -W all -a && \
+autoconf -W syntax
+
+if test "$?" != 0; then
 	cat <<EOF
 If you see errors it might be necessary to install additional packages like
 autoconf >= 2.60
